@@ -73,3 +73,43 @@ class Magazine:
      return contributors
     
     
+    def article_titles(self):
+        conn=get_db_connection()
+        cursor=conn.cursor()
+        query="""
+          SELECT title FROM articles
+          WHERE magazine_id=?
+        """
+        cursor.execute(query,(self.id,))
+        titles_data=cursor.fetchall()
+        conn.close
+
+        if not titles_data:
+            return None
+        #the strings of titles are returned
+        titles=[title['title'] for title in titles_data]
+        return titles
+    
+    def contributing_authors(self):
+        conn=get_db_connection()
+        cursor=conn.cursor()
+        query="""
+        SELECT authors_id,COUNT(*) as article_count FROM articles
+        WHERE magazine_id=?
+        GROUP BY author_id
+        HAVING article_count > 2
+        """
+        cursor.execute(query,(self.id,))
+        authors_data=cursor.fetchall()
+        conn.close
+
+        authors=[]
+        for author_data in authors_data:
+            author_id=author_data['author_id']
+            author=Author.get_by_id(author_id)
+            if author:
+                authors.append(author)
+        if authors:
+            return authors
+        else:
+            return None
