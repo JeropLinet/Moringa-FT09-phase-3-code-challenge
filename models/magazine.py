@@ -1,3 +1,6 @@
+from database.connection import get_db_connection
+from article import Article
+from author import Author
 class Magazine:
     def __init__(self, id, name, category):
         self.id = id
@@ -35,5 +38,38 @@ class Magazine:
         if not isinstance(value,str) or len(value) <= 0:
             raise ValueError("category must be a string that is longer than 0")
 
-
+    def articles(self):
+     conn=get_db_connection()
+     cursor=conn.cursor()
+     query="""
+      SELECT articles.* FROM articles
+      JOIN magazines ON articles.magazine_id=magazines.id
+      WHERE magazines.id=?
+      """
+     cursor.execute(query,(self.id,))
+     articles_data=cursor.fetchall()
+     conn.close()
+     
+     articles=[]
+     for article_data in articles_data:
+        articles.append(Article(article_data['id'],article_data['name'],article_data['category']))
+     return articles
+    
+    def contributors(self):
+     conn=get_db_connection()
+     cursor=conn.cursor()
+     query="""
+      SELECT authors.* FROM articles
+      JOIN magazines ON authors.magazine_id=magazines.id
+      WHERE magazines.id=?
+      """
+     cursor.execute(query,(self.id,))
+     authors_data=cursor.fetchall()
+     conn.close()
+     
+     contributors=[]
+     for author_data in authors_data:
+        contributors.append(Author(author_data['id'],author_data['name'],author_data['category']))
+     return contributors
+    
     
