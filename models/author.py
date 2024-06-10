@@ -1,6 +1,6 @@
 from database.connection import get_db_connection
-from article import Article
-from magazine import Magazine
+
+
 class Author:
     def __init__(self, id, name):
         self._id=None
@@ -35,6 +35,7 @@ class Author:
     
     #fetches ALL the articles assoiated wwith the author
     def articles(self):
+     from .article import Article
      conn=get_db_connection()
      cursor=conn.cursor()
      query="""
@@ -53,6 +54,7 @@ class Author:
     
     #fetches ALL the magazines associated with the author
     def magazines(self):
+     from .magazine import Magazine
      conn=get_db_connection()
      cursor=conn.cursor()
      query="""

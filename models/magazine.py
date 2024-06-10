@@ -1,11 +1,11 @@
 from database.connection import get_db_connection
-from article import Article
-from author import Author
+
+
 class Magazine:
     def __init__(self, id, name, category):
         self.id = id
         self.name = name
-        self.category = category
+        self._category = category
 
     def __repr__(self):
         return f'<Magazine {self.name}>'
@@ -39,6 +39,7 @@ class Magazine:
             raise ValueError("category must be a string that is longer than 0")
 
     def articles(self):
+     from .article import Article
      conn=get_db_connection()
      cursor=conn.cursor()
      query="""
@@ -56,6 +57,7 @@ class Magazine:
      return articles
     
     def contributors(self):
+     from .author import Author
      conn=get_db_connection()
      cursor=conn.cursor()
      query="""
