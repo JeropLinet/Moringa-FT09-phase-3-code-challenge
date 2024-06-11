@@ -64,23 +64,23 @@ class Article:
             return None
         
 
-def main():
-    db = Article()
+# def main():
+#     db = Article()
 
-    while True:
-        print("\n1. Fetch Author")
-        print("2. Exit")
+#     while True:
+#         print("\n1. Fetch Author")
+#         print("2. Exit")
 
-        choice = input( "Ënter Choice")
+#         choice = input( "Ënter Choice")
 
-        if choice == "1":
-            id = int(input("Enter id :"))
-            db.fetch_author(id)
-        elif choice == "2":
-            db.close()
-            break
-        else:
-            print("Invalid choice")
+#         if choice == "1":
+#             id = int(input("Enter id :"))
+#             db.fetch_author(id)
+#         elif choice == "2":
+#             db.close()
+#             break
+#         else:
+#             print("Invalid choice")
 
 if __name__ == "__main__":
     main()

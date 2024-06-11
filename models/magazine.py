@@ -3,8 +3,8 @@ from database.connection import get_db_connection
 
 class Magazine:
     def __init__(self, id, name, category):
-        self.id = id
-        self.name = name
+        self._id = id
+        self._name = name
         self._category = category
 
     def __repr__(self):
