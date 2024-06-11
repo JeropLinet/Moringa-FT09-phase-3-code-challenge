@@ -1,9 +1,50 @@
 import unittest
+import sqlite3
 from models.author import Author
 from models.article import Article
 from models.magazine import Magazine
+from database.connection import get_db_connection
+
+def setup_test_db():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.executescript("""
+    DROP TABLE IF EXISTS articles;
+    DROP TABLE IF EXISTS authors;
+    DROP TABLE IF EXISTS magazines;
+
+    CREATE TABLE authors (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL
+    );
+
+    CREATE TABLE magazines (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        category TEXT NOT NULL
+    );
+
+    CREATE TABLE articles (
+        id INTEGER PRIMARY KEY,
+        title TEXT NOT NULL,
+        content TEXT NOT NULL,
+        author_id INTEGER,
+        magazine_id INTEGER,
+        FOREIGN KEY (author_id) REFERENCES authors(id),
+        FOREIGN KEY (magazine_id) REFERENCES magazines(id)
+    );
+
+    INSERT INTO authors (id, name) VALUES (1, 'John Doe');
+    INSERT INTO magazines (id, name, category) VALUES (1, 'Tech Weekly', 'Technology');
+    INSERT INTO articles (id, title, content, author_id, magazine_id) VALUES (1, 'Test Title', 'Test Content', 1, 1);
+    """)
+    conn.commit()
+    conn.close()
 
 class TestModels(unittest.TestCase):
+    def setUp(self):
+        setup_test_db()
+
     def test_author_creation(self):
         author = Author(1, "John Doe")
         self.assertEqual(author.name, "John Doe")
@@ -19,6 +60,7 @@ class TestModels(unittest.TestCase):
 
 class TestArticle(unittest.TestCase):
     def setUp(self):
+        setup_test_db()
         self.article = Article(1, "Test Title", "Test Content", 1, 1)
 
     def test_article_initialization(self):
@@ -40,21 +82,22 @@ class TestArticle(unittest.TestCase):
         author = self.article.fetch_author()
         self.assertIsNotNone(author)
         self.assertEqual(author.id, 1)
-        self.assertEqual(author.name, "Author Name")
+        self.assertEqual(author.name, "John Doe")
 
     def test_fetch_magazine(self):
         magazine = self.article.fetch_magazine()
         self.assertIsNotNone(magazine)
         self.assertEqual(magazine.id, 1)
-        self.assertEqual(magazine.name, "Magazine Name")
+        self.assertEqual(magazine.name, "Tech Weekly")
 
 class TestAuthor(unittest.TestCase):
     def setUp(self):
-        self.author = Author(1, "Author Name")
+        setup_test_db()
+        self.author = Author(1, "John Doe")
 
     def test_author_initialization(self):
         self.assertEqual(self.author.id, 1)
-        self.assertEqual(self.author.name, "Author Name")
+        self.assertEqual(self.author.name, "John Doe")
 
     def test_author_id_setter_invalid(self):
         with self.assertRaises(ValueError):
@@ -75,16 +118,17 @@ class TestAuthor(unittest.TestCase):
         magazines = self.author.magazines()
         self.assertGreater(len(magazines), 0)
         self.assertEqual(magazines[0].id, 1)
-        self.assertEqual(magazines[0].name, "Magazine 1")
+        self.assertEqual(magazines[0].name, "Tech Weekly")
 
 class TestMagazine(unittest.TestCase):
     def setUp(self):
-        self.magazine = Magazine(1, "Magazine Name", "Category")
+        setup_test_db()
+        self.magazine = Magazine(1, "Tech Weekly", "Technology")
 
     def test_magazine_initialization(self):
         self.assertEqual(self.magazine.id, 1)
-        self.assertEqual(self.magazine.name, "Magazine Name")
-        self.assertEqual(self.magazine.category, "Category")
+        self.assertEqual(self.magazine.name, "Tech Weekly")
+        self.assertEqual(self.magazine.category, "Technology")
 
     def test_magazine_id_setter_invalid(self):
         with self.assertRaises(ValueError):
@@ -109,7 +153,7 @@ class TestMagazine(unittest.TestCase):
         contributors = self.magazine.contributors()
         self.assertGreater(len(contributors), 0)
         self.assertEqual(contributors[0].id, 1)
-        self.assertEqual(contributors[0].name, "Author 1")
+        self.assertEqual(contributors[0].name, "John Doe")
 
 if __name__ == "__main__":
     unittest.main()

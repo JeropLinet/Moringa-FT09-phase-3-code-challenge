@@ -46,22 +46,23 @@ class Article:
    
     #fetches magazine associated with the article using SQL JOIN btw articles and magazine table
     def fetch_magazine(self):
-        from .magazine import Magazine
-        from database.connection import get_db_connection
-        conn=get_db_connection()
-        cursor=conn.cursor()
-        query="""
-         SELECT magazines.* FROM articles
-         JOIN magazines ON ,magazines.magazine_id=magazines.id
-         WHERE magazines.id=?
-        """
-        cursor.execute(query,(self.id,))
-        magazine_data=cursor.fetchone()
-        conn.close()
-        if magazine_data:
-            return Magazine(magazine_data['id'],magazine_data['name'])
-        else:
-            return None
+     from .magazine import Magazine
+     from database.connection import get_db_connection
+     conn = get_db_connection()
+     cursor = conn.cursor()
+     query = """
+     SELECT magazines.* FROM articles
+     JOIN magazines ON articles.magazine_id = magazines.id
+     WHERE articles.id = ?
+     """
+     cursor.execute(query, (self.id,))
+     magazine_data = cursor.fetchone()
+     conn.close()
+     if magazine_data:
+        return Magazine(magazine_data['id'], magazine_data['name'], magazine_data['category'])
+     else:
+        return None
+
         
 
 # def main():
